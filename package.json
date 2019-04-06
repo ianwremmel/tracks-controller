@@ -11,8 +11,10 @@
   "scripts": {
     "build": "npm-run-all build:*",
     "build:readme": "markdown-toc -i --bullets='-' --maxdepth=3  README.md  && prettier --write README.md",
+    "eslint": "eslint --ignore --ignore-path .gitignore",
     "lint": "npm-run-all lint:*",
     "lint:changelog": "commitlint --from origin/master --to HEAD",
+    "lint:js": "npm run --silent eslint -- .",
     "test": "echo 'no tests specified'; exit 1"
   },
   "engines": {
@@ -25,12 +27,25 @@
   "devDependencies": {
     "@commitlint/cli": "^7.5.2",
     "@commitlint/config-conventional": "^7.5.0",
+    "@ianwremmel/eslint-plugin-ianwremmel": "^3.0.0",
+    "eslint": "^5.16.0",
+    "eslint-config-prettier": "^4.1.0",
+    "eslint-plugin-compat": "^3.1.1",
+    "eslint-plugin-eslint-comments": "^3.1.1",
+    "eslint-plugin-import": "^2.16.0",
+    "eslint-plugin-markdown": "^1.0.0",
+    "eslint-plugin-mocha": "^5.3.0",
+    "eslint-plugin-prettier": "^3.0.1",
     "husky": "^1.3.1",
     "lint-staged": "^8.1.5",
     "markdown-toc": "^1.2.0",
-    "npm-run-all": "^4.1.5"
+    "npm-run-all": "^4.1.5",
+    "prettier": "^1.16.4"
   },
-  "lint-staged": {},
+  "lint-staged": {
+    "*.js": "npm run eslint -- ",
+    "bin/**": "npm run eslint -- "
+  },
   "husky": {
     "hooks": {
       "commit-msg": "commitlint -e",
