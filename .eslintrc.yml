@@ -37,3 +37,8 @@ parserOptions:
 rules:
   no-restricted-syntax: off
   compat/compat: off
+  new-cap:
+    - error
+    - capIsNewExceptions:
+        - Router
+  require-jsdoc: off

@@ -2,7 +2,8 @@
   "compilerOptions": {
     "declaration": true,
     "esModuleInterop": true,
-    "lib": ["esnext"],
+    // Note: we need dom because supertest's types reference some browser types
+    "lib": ["dom", "esnext"],
     "moduleResolution": "node",
     "outDir": "dist",
     "resolveJsonModule": true,
