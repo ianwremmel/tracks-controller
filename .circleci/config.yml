@@ -1,20 +1,36 @@
 restore_cache: &restore_cache
   keys:
-    - node-modules-{{ arch }}-{{ .Environment.CIRCLE_JOB }}-{{ .Branch }}-{{ checksum "package.json" }}
-    - node-modules-{{ arch }}-{{ .Environment.CIRCLE_JOB }}-{{ checksum "package.json" }}
-    - node-modules-{{ arch }}-{{ checksum "package.json" }}
+    - node-modules-{{ arch }}-{{ checksum "package-lock.json" }}
 
 save_cache: &save_cache
-  key: node-modules-{{ arch }}-{{ .Environment.CIRCLE_JOB }}-{{ .Branch }}-{{ checksum "package.json" }}
+  key: node-modules-{{ arch }}-{{ checksum "package-lock.json" }}
   paths:
     - node_modules
+  when: always
 
 docker: &docker
-  - image: "node:10"
+  - image: 'node:10'
 
-version: 2
+filter_master_only: &filter_master_only
+  branches:
+    only: master
+
+commands:
+  pre_commands:
+    steps:
+      - checkout
+      - attach_workspace:
+          at: '.'
+
+  post_commands:
+    steps:
+      - store_test_results:
+          path: reports
+      - store_artifacts:
+          path: reports
+
+version: 2.1
 jobs:
-
   install:
     docker: *docker
     environment:
@@ -22,7 +38,7 @@ jobs:
     steps:
       - checkout
       - restore_cache: *restore_cache
-      - run: npm install
+      - run: npm ci
       - save_cache: *save_cache
       - persist_to_workspace:
           root: .
@@ -32,34 +48,25 @@ jobs:
   lint:
     docker: *docker
     steps:
-      - checkout
-      - attach_workspace:
-          at: "."
+      - pre_commands
       - run: npm run lint
+      - post_commands
 
   test:
     docker: *docker
     environment:
       PORT: '4000'
     steps:
-      - checkout
-      - attach_workspace:
-          at: "."
-      - run: npm run build
-      - run: npm test
-      - store_test_results:
-          path: reports
-      - store_artifacts:
-          path: reports
+      - pre_commands
+      - run: npm run test
+      - post_commands
 
   release:
     docker: *docker
     environment:
       NODE_ENV: production
     steps:
-      - checkout
-      - attach_workspace:
-          at: "."
+      - pre_commands
       - deploy:
           name: Semantic Release
           command: |
@@ -80,9 +87,7 @@ workflows:
             - install
       - release:
           context: semantic-release
-          filters:
-            branches:
-              only: master
+          filters: *filter_master_only
           requires:
             - test
             - lint

@@ -1,0 +1,20 @@
+{
+  "compilerOptions": {
+    "declaration": true,
+    "esModuleInterop": true,
+    // Note: we need dom because supertest's types reference some browser types
+    "lib": ["dom", "esnext"],
+    "moduleResolution": "node",
+    "outDir": "dist",
+    "resolveJsonModule": true,
+    "strict": true,
+    "target": "es2017",
+    "types": ["jest"]
+  },
+  "include": [
+    "./src/**/*.js",
+    "./test/**/*.js",
+    "./src/**/*.ts",
+    "./test/**/*.ts"
+  ]
+}
