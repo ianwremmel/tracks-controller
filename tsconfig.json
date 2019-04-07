@@ -1,11 +1,10 @@
 {
   "compilerOptions": {
-    "allowJs": true,
-    "checkJs": true,
+    "declaration": true,
     "esModuleInterop": true,
     "lib": ["esnext"],
     "moduleResolution": "node",
-    "noEmit": true,
+    "outDir": "dist",
     "resolveJsonModule": true,
     "strict": true,
     "target": "es2017",
