@@ -5,7 +5,7 @@ import {
 } from '@ianwremmel/typed-http-exceptions';
 
 import {get} from './lib/get';
-import {ResourceControllerInstance} from './types';
+import {ResourceControllerInstance, Logger} from './types';
 
 const requests: WeakMap<ResourceController, Request> = new WeakMap();
 
@@ -25,11 +25,11 @@ export class ResourceController implements ResourceControllerInstance {
     return new this(req, res);
   }
 
-  static get singleton() {
+  static get singleton(): boolean {
     return false;
   }
 
-  get logger() {
+  get logger(): Logger | typeof console {
     return this.req.logger || console;
   }
 
