@@ -66,6 +66,9 @@ import path from 'path';
     app.use(
         '/',
         await configureRouteControllers({
+            // extensions defaults to '.js', but you might want to incldue '.ts'
+            // files, for example, if your dev setup does JIT compilation
+            extensions: ['js'],
             root: path.join(__dirname, 'controllers'),
         })
     );
