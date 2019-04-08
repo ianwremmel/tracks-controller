@@ -55,10 +55,14 @@ export const singletonActionMap: RouteConfig[] = [
 export const actions = normalActionMap.map(({action}) => action);
 
 interface ConfigureOptions {
+  extensions: string[];
   root: string;
 }
 
-export async function configure({root}: ConfigureOptions): Promise<Router> {
+export async function configure({
+  extensions = ['js'],
+  root,
+}: ConfigureOptions): Promise<Router> {
   const initialMiddleware = [cookieParser(), csurf({cookie: true})];
 
   const router = express.Router();
@@ -74,7 +78,7 @@ export async function configure({root}: ConfigureOptions): Promise<Router> {
     })
   );
 
-  const controllers = loadControllers(root);
+  const controllers = loadControllers({extensions, root});
   router.use(mountControllers(controllers, initialMiddleware));
 
   return router;
@@ -84,10 +88,21 @@ export function isRouteAction(str: any): str is RouteActionName {
   return actions.includes(str);
 }
 
-function loadControllers(root: string) {
-  const filenames = glob
-    .sync('**/*.js', {cwd: root})
-    .map((f) => f.replace('.js', ''));
+function loadControllers({
+  root,
+  extensions,
+}: {
+  root: string;
+  extensions: string[];
+}) {
+  let filenames: string[] = [];
+  for (const extension of extensions) {
+    // remove leading period, if it exists
+    const ext = extension.replace(/^\./, '');
+    filenames = filenames.concat(
+      glob.sync(`**/*.${ext}`, {cwd: root}).map((f) => f.replace(`.${ext}`, ''))
+    );
+  }
 
   const controllers = new Map();
   for (const filename of filenames) {

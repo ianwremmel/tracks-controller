@@ -57,14 +57,18 @@ express router. Its `root` parameter points to the directory containing your
 controllers
 
 ```js
-import {configure as configureRouteControllers} from './kernel/controller';
+import {configure as configureRouteControllers} from '@ianwremmel/tracks-controller';
 import path from 'path';
 
+// Take a look @ianwremmel/tracks-boot for a cleaner way to do async loading
 (async function boot() {
     const app = express();
     app.use(
         '/',
         await configureRouteControllers({
+            // extensions defaults to '.js', but you might want to incldue '.ts'
+            // files, for example, if your dev setup does JIT compilation
+            extensions: ['js'],
             root: path.join(__dirname, 'controllers'),
         })
     );
@@ -123,7 +127,7 @@ serving pages.
 /**
  * @file 'users/photos.js'
  */
-import {ResourceController} from 'controller';
+import {ResourceController} from '@ianwremmel/tracks-controller';
 
 export default UserPhotosController extends ResourceController() {
     async create(req, res) {
