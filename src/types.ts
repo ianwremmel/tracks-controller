@@ -1,5 +1,15 @@
 import {Request, Response, RequestHandler} from 'express';
 
+export interface Logger {
+  error: LogMethod;
+  warn: LogMethod;
+  info: LogMethod;
+  debug: LogMethod;
+  child?: (meta: Record<string, any>) => Logger;
+}
+
+export type LogMethod = typeof console.log;
+
 export type RouteActionName =
   | 'index'
   | 'new'
