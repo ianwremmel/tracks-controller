@@ -11,7 +11,7 @@
   "scripts": {
     "build": "npm-run-all build:*",
     "build:readme": "markdown-toc -i --bullets='-' --maxdepth=3  README.md  && prettier --write README.md",
-    "build:es": "babel --ignore '**/*.d.ts' --extensions '.js,.ts' -d dist src",
+    "build:es": "babel --source-maps --ignore '**/*.d.ts' --extensions '.js,.ts' -d dist src",
     "build:types": "tsc --emitDeclarationOnly",
     "eslint": "eslint --ignore --ignore-path .gitignore --ext .js --ext .ts",
     "lint": "npm-run-all lint:*",
