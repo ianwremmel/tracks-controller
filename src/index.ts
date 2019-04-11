@@ -253,7 +253,22 @@ async function applyFilters(
   for (const configured of filters) {
     const [filter, config] = parseFilter(configured);
     if (config.only.includes(action)) {
-      await filter.call(controller, req, res);
+      if (filter.length === 2) {
+        // tsc can't tell this is ok. maybe need a two different filter defs,
+        // one for promises and one for callbacks plus a typeguard function
+        // @ts-ignore
+        await filter.call(controller, req, res);
+      } else {
+        await new Promise((resolve, reject) => {
+          filter.call(controller, req, res, (err: Error) => {
+            if (err) {
+              reject(err);
+              return;
+            }
+            resolve();
+          });
+        });
+      }
     }
   }
 }

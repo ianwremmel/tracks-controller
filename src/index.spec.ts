@@ -1,4 +1,4 @@
-import express from 'express';
+import express, {Request, Response, NextFunction} from 'express';
 import supertest from 'supertest';
 
 import {ResourceController} from './resource-controller';
@@ -403,6 +403,39 @@ describe('Kernel', () => {
             method: 'destroy',
           })
         );
+      });
+    });
+
+    describe('filters', () => {
+      describe('beforeFilter', () => {
+        class FilteredController extends ResourceController {
+          get beforeAction() {
+            return [
+              (req: Request, res: Response, next: NextFunction) => {
+                res.write('a');
+                next();
+              },
+            ];
+          }
+          async create(req: express.Request, res: express.Response) {
+            res.write('b');
+            res.end();
+          }
+        }
+        it('adds middleware before an action', () => {
+          const app = express();
+          app.use(
+            // the beforeAction doesn't get detected as a proper beforeAction,
+            // but it is. The outside of tests, tsc won't have the chance to
+            // complain to consumers
+            // @ts-ignore
+            mountControllers(new Map([['filtered', FilteredController]]))
+          );
+          return supertest(app)
+            .post('/filtered')
+            .expect(200)
+            .expect('ab');
+        });
       });
     });
   });
