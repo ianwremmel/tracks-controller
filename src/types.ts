@@ -1,4 +1,4 @@
-import {Request, Response, RequestHandler} from 'express';
+import {NextFunction, Request, Response, RequestHandler} from 'express';
 
 export interface Logger {
   error: LogMethod;
@@ -33,6 +33,12 @@ export interface BeforeOrAfterFilter {
   (this: ResourceControllerInstance, req: Request, res: Response): Promise<
     void
   >;
+  (
+    this: ResourceControllerInstance,
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ): void;
 }
 
 export interface FilterConfig {
