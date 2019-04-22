@@ -50,6 +50,28 @@ routes. See [usage](#usage) for how `Controller` can help.
 npm install @ianwremmel/tracks-controller
 ```
 
+### Typings
+
+In order to grant access to application-specific logic without either a complex
+factory pattern or `import`ing configured dependency, controllers assume the
+express application has a `services` property that contains your app's
+configured helpers. `services` is where you might put your database library,
+initialized third-party clients, etc. `services` are any connectors that run for
+the duration of the app and not a single request.
+
+You can tell typescript what your services look like by creating a file like the
+following and ensuring it's loaded by tsc. (Make sure to make it a `.d.ts` file)
+
+```ts
+declare namespace Express {
+    export type Services = import('./path-to-my-service-defintion').Services;
+}
+```
+
+> Typescript is weird. If your controllers don't need services, you'll still
+> need to create a file like the one above, but you can just use
+> `export type Services = never;` to disable it.
+
 ## Usage
 
 This library exports a configuration function that asynchronously produces an

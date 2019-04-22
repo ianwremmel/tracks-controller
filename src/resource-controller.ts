@@ -41,7 +41,7 @@ export class ResourceController implements ResourceControllerInstance {
     return get(responses, this);
   }
 
-  get services() {
+  get services(): Express.Services {
     const srvcs = this.req.app.services;
     if (!srvcs) {
       throw new InternalServerError(
