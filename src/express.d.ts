@@ -5,6 +5,7 @@ import {Logger} from './types';
 
 declare global {
   namespace Express {
+    export type Services = Record<string, any>;
     interface Response {
       logger?: Logger;
       user?: {};
@@ -16,7 +17,7 @@ declare global {
     }
 
     interface Application {
-      services?: Record<string, any>;
+      services?: Services;
     }
   }
 }
