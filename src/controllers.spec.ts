@@ -2,13 +2,13 @@ import express, {Request, Response, NextFunction} from 'express';
 import supertest from 'supertest';
 
 import {ResourceController} from './resource-controller';
-
 import {
+  ControllerPathMap,
+  IControllerStatic,
   mountControllers,
-  RouteVerb,
-  RouteActionName,
-  ResourceControllerConstructor,
-} from '.';
+  IController,
+} from './controllers';
+import {RouteActionName, RouteVerb} from './actions';
 
 describe('Controllers', () => {
   class MockCompleteController extends ResourceController {
@@ -57,7 +57,7 @@ describe('Controllers', () => {
   }
 
   function makeTestBody(
-    controllers: Map<string, ResourceControllerConstructor>,
+    controllers: Map<string, IControllerStatic>,
     method: RouteVerb,
     path: string,
     expected: {controller: string; method: RouteActionName}
@@ -76,14 +76,11 @@ describe('Controllers', () => {
     class NestedController extends ResourceController {}
     class NestedIndexController extends ResourceController {}
 
-    expect(() =>
-      mountControllers(
-        new Map([
-          ['nested', NestedController],
-          ['nested/index', NestedIndexController],
-        ])
-      )
-    ).toThrow(
+    const controllers: ControllerPathMap = new Map();
+    controllers.set('nested', NestedController);
+    controllers.set('nested/index', NestedIndexController);
+
+    expect(() => mountControllers(controllers)).toThrow(
       `Attempted to register colliding controllers NestedController and NestedIndexController`
     );
   });
@@ -95,7 +92,9 @@ describe('Controllers', () => {
       }
     }
 
-    const controllers = new Map([['singleton', SingletonController]]);
+    const controllers: ControllerPathMap = new Map([
+      ['singleton', SingletonController],
+    ]);
 
     it(
       'routes GET /new to new',
@@ -155,10 +154,7 @@ describe('Controllers', () => {
     class NestedIndexController extends MockCompleteController {}
     class NestedSiblingController extends MockCompleteController {}
 
-    const commonControllers: Map<
-      string,
-      ResourceControllerConstructor
-    > = new Map([
+    const commonControllers: ControllerPathMap = new Map([
       ['index', IndexController],
       ['not-nested', NotNestedController],
       ['nested', NestedController],
@@ -343,8 +339,6 @@ describe('Controllers', () => {
       );
     });
 
-    // describe('NestedIndexController', () => {});
-
     describe('NestedSiblingController', () => {
       it(
         'routes GET /nested/sibling to index',
@@ -407,21 +401,23 @@ describe('Controllers', () => {
 
   describe('filters', () => {
     describe('beforeFilter', () => {
-      class FilteredController extends ResourceController {
-        get beforeAction() {
-          return [
-            (req: Request, res: Response, next: NextFunction) => {
-              res.write('a');
-              next();
-            },
-          ];
+      it('adds a single middleware before an action', () => {
+        class FilteredController extends ResourceController
+          implements IController {
+          get beforeAction() {
+            return [
+              (req: Request, res: Response, next: NextFunction) => {
+                res.write('a');
+                next();
+              },
+            ];
+          }
+          async create(req: express.Request, res: express.Response) {
+            res.write('b');
+            res.end();
+          }
         }
-        async create(req: express.Request, res: express.Response) {
-          res.write('b');
-          res.end();
-        }
-      }
-      it('adds middleware before an action', () => {
+
         const app = express();
         app.use(
           // the beforeAction doesn't get detected as a proper beforeAction,
@@ -434,6 +430,42 @@ describe('Controllers', () => {
           .post('/filtered')
           .expect(200)
           .expect('ab');
+      });
+
+      it('adds several middleware before an action', () => {
+        class FilteredController extends ResourceController
+          implements IController {
+          get beforeAction() {
+            return [
+              (req: Request, res: Response, next: NextFunction) => {
+                res.write('a');
+                next();
+              },
+              (req: Request, res: Response, next: NextFunction) => {
+                res.write('b');
+                next();
+              },
+            ];
+          }
+          async create(req: express.Request, res: express.Response) {
+            res.write('c');
+            res.end();
+          }
+        }
+
+        const app = express();
+        app.use(
+          // the beforeAction doesn't get detected as a proper beforeAction,
+          // but it is. The outside of tests, tsc won't have the chance to
+
+          // complain to consumers
+          // @ts-ignore
+          mountControllers(new Map([['filtered', FilteredController]]))
+        );
+        return supertest(app)
+          .post('/filtered')
+          .expect(200)
+          .expect('abc');
       });
     });
   });

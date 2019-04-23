@@ -4,7 +4,7 @@ import express, {Request, Response} from 'express';
 import supertest from 'supertest';
 
 import {ResourceController} from './resource-controller';
-import {ResourceControllerConstructor} from './types';
+import {IControllerStatic} from './controllers';
 
 import {mountControllers, ViewController} from '.';
 
@@ -21,7 +21,7 @@ describe('Controllers', () => {
         async create(req: Request, res: Response) {}
       }
 
-      const controllers: Map<string, ResourceControllerConstructor> = new Map([
+      const controllers: Map<string, IControllerStatic> = new Map([
         ['v', VController],
       ]);
       app.use(mountControllers(controllers));
@@ -44,7 +44,7 @@ describe('Controllers', () => {
         }
       }
 
-      const controllers: Map<string, ResourceControllerConstructor> = new Map();
+      const controllers: Map<string, IControllerStatic> = new Map();
       controllers.set('r', RController);
       controllers.set('v', VController);
 

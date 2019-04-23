@@ -5,15 +5,15 @@ import {
 } from '@ianwremmel/typed-http-exceptions';
 
 import {get} from './lib/get';
-import {ResourceControllerInstance, Logger} from './types';
+import {Logger} from './types';
+import {IController} from './controllers';
 
 const requests: WeakMap<ResourceController, Request> = new WeakMap();
 
 const responses: WeakMap<ResourceController, Response> = new WeakMap();
 
-export class ResourceController implements ResourceControllerInstance {
-  /** @ignore - this is just here make the typescript compiler happy */
-  get discriminator() {
+export class ResourceController implements IController {
+  get discriminator(): true {
     return true;
   }
   constructor(req: Request, res: Response) {
