@@ -15,6 +15,7 @@ export class ResourceController implements IController {
   get discriminator(): true {
     return true;
   }
+
   constructor(req: Request, res: Response) {
     requests.set(this, req);
     responses.set(this, res);
@@ -29,6 +30,8 @@ export class ResourceController implements IController {
   }
 
   get logger() {
+    // @ts-ignore I know logger isn't on request, that's why this falls back to
+    // console
     return this.req.logger || console;
   }
 
@@ -38,22 +41,5 @@ export class ResourceController implements IController {
 
   get res() {
     return get(responses, this);
-  }
-
-  get services(): Express.Services {
-    const srvcs = this.req.app.services;
-    if (!srvcs) {
-      throw new InternalServerError(
-        'Services have not been configured for this app'
-      );
-    }
-    return srvcs;
-  }
-
-  get user(): {} {
-    if (!this.req.user) {
-      throw new Unauthorized();
-    }
-    return this.req.user;
   }
 }
