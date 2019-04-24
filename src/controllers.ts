@@ -6,6 +6,16 @@ import {controllerComparator, validateIndexControllerNames} from './lib';
 import {TypeNarrowingError} from './lib/type-narrowing-error';
 import {applyFilters, BeforeActionList, AfterActionList} from './filters';
 
+declare global {
+  namespace Express {
+    export type Services = Record<string, any>;
+
+    interface Application {
+      services?: Services;
+    }
+  }
+}
+
 export interface IControllerStatic {
   singleton?: boolean;
   new (req: Request, res: Response): IController;

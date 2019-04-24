@@ -3,17 +3,11 @@ import path from 'path';
 
 import express, {Router, RequestHandler, Request, Response} from 'express';
 import glob from 'glob';
-import methodOverride from 'method-override';
-import bodyParser from 'body-parser';
-import cookieParser from 'cookie-parser';
-import csurf from 'csurf';
 
 import {mountControllers} from './controllers';
 import {controllerize, inherits} from './lib/inerits';
 
 export {ResourceController} from './resource-controller';
-export {ViewController} from './view-controller';
-export * from './types';
 export {mountController, mountControllers} from './controllers';
 
 interface ConfigureOptions {

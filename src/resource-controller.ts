@@ -5,7 +5,6 @@ import {
 } from '@ianwremmel/typed-http-exceptions';
 
 import {get} from './lib/get';
-import {Logger} from './types';
 import {IController} from './controllers';
 
 const requests: WeakMap<ResourceController, Request> = new WeakMap();
@@ -29,7 +28,7 @@ export class ResourceController implements IController {
     return false;
   }
 
-  get logger(): Logger | typeof console {
+  get logger() {
     return this.req.logger || console;
   }
 

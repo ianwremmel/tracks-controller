@@ -46,3 +46,7 @@ export interface Action {
 }
 
 export const actions = normalActionMap.map(({action}) => action);
+
+export function isRouteAction(raw: any): raw is RouteActionName {
+  return actions.includes(raw);
+}
