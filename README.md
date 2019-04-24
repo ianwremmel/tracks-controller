@@ -50,28 +50,6 @@ routes. See [usage](#usage) for how `Controller` can help.
 npm install @ianwremmel/tracks-controller
 ```
 
-### Typings
-
-In order to grant access to application-specific logic without either a complex
-factory pattern or `import`ing configured dependency, controllers assume the
-express application has a `services` property that contains your app's
-configured helpers. `services` is where you might put your database library,
-initialized third-party clients, etc. `services` are any connectors that run for
-the duration of the app and not a single request.
-
-You can tell typescript what your services look like by creating a file like the
-following and ensuring it's loaded by tsc. (Make sure to make it a `.d.ts` file)
-
-```ts
-declare namespace Express {
-    export type Services = import('./path-to-my-service-defintion').Services;
-}
-```
-
-> Typescript is weird. If your controllers don't need services, you'll still
-> need to create a file like the one above, but you can just use
-> `export type Services = never;` to disable it.
-
 ## Usage
 
 This library exports a configuration function that asynchronously produces an
@@ -99,9 +77,8 @@ import path from 'path';
 })();
 ```
 
-Your controlers should inherit from `ResourceController` for API route or
-`ViewController` for routes that serve views. In either case, they'll follow one
-of the following routing tables.
+Your controllers should inherit from `ResourceController`. They'll follow one of
+the following routing tables.
 
 Routing is taken directly from the
 [rails conventions](https://guides.rubyonrails.org/routing.html#crud-verbs-and-actions).
@@ -121,11 +98,6 @@ routed based on file location.
 However, we do provide one convenince that rails doesn't. If you set
 `Controller.singleton` to `true`, your controller will follow a different
 routing table that makes sense for things like the current user's profile page.
-
-Routing is taken directly from the
-[rails conventions](https://guides.rubyonrails.org/routing.html#crud-verbs-and-actions).
-Unlike rails, `Controller` doesn't let you provide a route config; everything is
-routed based on file location.
 
 | HTTP Verb | Path  | Controller#Action | Used for                                                   |
 | --------- | ----- | ----------------- | ---------------------------------------------------------- |
@@ -155,6 +127,58 @@ export default UserPhotosController extends ResourceController() {
     async create(req, res) {
         // TODO something with the photo
         res.status.send(201).end
+    }
+}
+```
+
+## ViewControllers
+
+A previous version of this library attempted to provide automatic view rendering
+in controller form, but all of the bits needed to make it work reasonably had to
+be too intertwined in the main project for it to stand alone. It may return as
+its own library at some point. In the meantime, consider something like the
+following for defining a minimal view controller:
+
+```ts
+export class ViewController extends ResourceController {
+    static async init(req: Request, res: Response) {
+        const controller = new this(req, res);
+        return new Proxy(controller, {
+            get(target, prop, receiver) {
+                const value = Reflect.get(target, prop, receiver);
+
+                if (isRouteAction(prop)) {
+                    const viewName = `${routify(
+                        target.constructor.name
+                    )}/${prop}`;
+
+                    return async () => {
+                        if (!value) {
+                            throw new NotFound();
+                        }
+
+                        await value.call(target, req, res);
+
+                        if (res.headersSent) {
+                            return;
+                        }
+
+                        target.logger.info(`rendering ${viewName}`);
+                        /*
+                            this is where things break down keeping
+                            ViewController in the library; no good way of
+                            customizing locals presented itself at thetime and
+                            they're critical for Views
+                        */
+                        const locals = {};
+
+                        target.res.render(viewName, locals);
+                    };
+                }
+
+                return value;
+            },
+        });
     }
 }
 ```

@@ -5,17 +5,17 @@ import {
 } from '@ianwremmel/typed-http-exceptions';
 
 import {get} from './lib/get';
-import {ResourceControllerInstance, Logger} from './types';
+import {IController} from './controllers';
 
 const requests: WeakMap<ResourceController, Request> = new WeakMap();
 
 const responses: WeakMap<ResourceController, Response> = new WeakMap();
 
-export class ResourceController implements ResourceControllerInstance {
-  /** @ignore - this is just here make the typescript compiler happy */
-  get discriminator() {
+export class ResourceController implements IController {
+  get discriminator(): true {
     return true;
   }
+
   constructor(req: Request, res: Response) {
     requests.set(this, req);
     responses.set(this, res);
@@ -29,7 +29,9 @@ export class ResourceController implements ResourceControllerInstance {
     return false;
   }
 
-  get logger(): Logger | typeof console {
+  get logger() {
+    // @ts-ignore I know logger isn't on request, that's why this falls back to
+    // console
     return this.req.logger || console;
   }
 
@@ -39,22 +41,5 @@ export class ResourceController implements ResourceControllerInstance {
 
   get res() {
     return get(responses, this);
-  }
-
-  get services(): Express.Services {
-    const srvcs = this.req.app.services;
-    if (!srvcs) {
-      throw new InternalServerError(
-        'Services have not been configured for this app'
-      );
-    }
-    return srvcs;
-  }
-
-  get user(): {} {
-    if (!this.req.user) {
-      throw new Unauthorized();
-    }
-    return this.req.user;
   }
 }
