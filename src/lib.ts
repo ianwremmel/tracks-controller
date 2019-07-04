@@ -18,6 +18,10 @@ export function controllerComparator(a: string, b: string) {
     return 1;
   }
 
+  if (b.endsWith('index')) {
+    return -1;
+  }
+
   if (a > b) {
     return 1;
   }
