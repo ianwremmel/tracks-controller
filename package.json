@@ -81,6 +81,9 @@
     }
   },
   "release": {
+    "branches": [
+      "master"
+    ],
     "verifyConditions": "condition-circle"
   },
   "publishConfig": {
