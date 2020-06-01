@@ -1,11 +1,11 @@
 import assert from 'assert';
 import path from 'path';
 
-import express, {Router, RequestHandler, Request, Response} from 'express';
+import express, {Router} from 'express';
 import glob from 'glob';
 
 import {mountControllers} from './controllers';
-import {controllerize, inherits} from './lib/inerits';
+import {controllerize} from './lib/inerits';
 
 export {ResourceController} from './resource-controller';
 export {mountController, mountControllers} from './controllers';

@@ -1,26 +1,25 @@
-restore_cache: &restore_cache
-  keys:
-    - node-modules-{{ arch }}-{{ checksum "package-lock.json" }}
-
-save_cache: &save_cache
-  key: node-modules-{{ arch }}-{{ checksum "package-lock.json" }}
-  paths:
-    - node_modules
-  when: always
-
-docker: &docker
-  - image: 'node:10'
-
-filter_master_only: &filter_master_only
-  branches:
-    only: master
+version: 2.1
 
 commands:
   pre_commands:
+    parameters:
+      node-version:
+        type: string
     steps:
       - checkout
-      - attach_workspace:
-          at: '.'
+      - restore_cache:
+          keys:
+            - |
+              node-modules-{{ arch }}-<< parameters.node-version >>-{{ checksum "package-lock.json" }}
+      - node/install:
+          node-version: << parameters.node-version >>
+      - node/install-packages
+      - save_cache:
+          key: |
+            node-modules-{{ arch }}-<< parameters.node-version >>-{{ checksum "package-lock.json" }}
+          paths:
+            - node_modules
+          when: always
 
   post_commands:
     steps:
@@ -29,65 +28,57 @@ commands:
       - store_artifacts:
           path: reports
 
-version: 2.1
+orbs:
+  node: circleci/node@2
+
 jobs:
-  install:
-    docker: *docker
-    environment:
-      NPM_CONFIG_LOGLEVEL: warn
+  test:
+    parameters:
+      node-version:
+        type: string
+    executor: node/default
     steps:
-      - checkout
-      - restore_cache: *restore_cache
-      - run: npm ci
-      - save_cache: *save_cache
-      - persist_to_workspace:
-          root: .
-          paths:
-            - node_modules
+      - pre_commands:
+          node-version: << parameters.node-version >>
+      - run: npm test
+      - post_commands
 
   lint:
-    docker: *docker
+    executor: node/default
     steps:
-      - pre_commands
+      - pre_commands:
+          node-version: '12.17.0'
       - run: npm run lint
       - post_commands
 
-  test:
-    docker: *docker
-    environment:
-      PORT: '4000'
-    steps:
-      - pre_commands
-      - run: npm run test
-      - post_commands
-
   release:
-    docker: *docker
-    environment:
-      NODE_ENV: production
+    executor: node/default
     steps:
-      - pre_commands
+      - pre_commands:
+          node-version: '12.17.0'
       - deploy:
-          name: Semantic Release
           command: |
             echo '//registry.npmjs.org/:_authToken=${NPM_TOKEN}' > ./.npmrc
+            npm whoami
             npm run build
             npm run semantic-release
+      - post_commands
 
 workflows:
   version: 2
   build:
     jobs:
-      - install
-      - lint:
-          requires:
-            - install
+      - lint
       - test:
-          requires:
-            - install
+          matrix:
+            parameters:
+              node-version:
+                - '12.17.0'
       - release:
           context: semantic-release
-          filters: *filter_master_only
+          filters:
+            branches:
+              only: master
           requires:
-            - test
             - lint
+            - test

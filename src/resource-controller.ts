@@ -30,7 +30,8 @@ export class ResourceController implements IController {
   }
 
   get logger() {
-    // @ts-ignore I know logger isn't on request, that's why this falls back to
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    // @ts-expect-error I know logger isn't on request, that's why this falls back to
     // console
     return this.req.logger || console;
   }

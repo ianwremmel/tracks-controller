@@ -65,10 +65,7 @@ describe('Controllers', () => {
     return () => {
       const app = express();
       app.use(mountControllers(controllers));
-      return supertest(app)
-        [method](path)
-        .expect(200)
-        .expect(expected);
+      return supertest(app)[method](path).expect(200).expect(expected);
     };
   }
 
@@ -151,7 +148,6 @@ describe('Controllers', () => {
     class IndexController extends MockCompleteController {}
     class NotNestedController extends MockCompleteController {}
     class NestedController extends MockCompleteController {}
-    class NestedIndexController extends MockCompleteController {}
     class NestedSiblingController extends MockCompleteController {}
 
     const commonControllers: ControllerPathMap = new Map([
@@ -419,17 +415,8 @@ describe('Controllers', () => {
         }
 
         const app = express();
-        app.use(
-          // the beforeAction doesn't get detected as a proper beforeAction,
-          // but it is. The outside of tests, tsc won't have the chance to
-          // complain to consumers
-          // @ts-ignore
-          mountControllers(new Map([['filtered', FilteredController]]))
-        );
-        return supertest(app)
-          .post('/filtered')
-          .expect(200)
-          .expect('ab');
+        app.use(mountControllers(new Map([['filtered', FilteredController]])));
+        return supertest(app).post('/filtered').expect(200).expect('ab');
       });
 
       it('adds several middleware before an action', () => {
@@ -454,18 +441,8 @@ describe('Controllers', () => {
         }
 
         const app = express();
-        app.use(
-          // the beforeAction doesn't get detected as a proper beforeAction,
-          // but it is. The outside of tests, tsc won't have the chance to
-
-          // complain to consumers
-          // @ts-ignore
-          mountControllers(new Map([['filtered', FilteredController]]))
-        );
-        return supertest(app)
-          .post('/filtered')
-          .expect(200)
-          .expect('abc');
+        app.use(mountControllers(new Map([['filtered', FilteredController]])));
+        return supertest(app).post('/filtered').expect(200).expect('abc');
       });
     });
   });
