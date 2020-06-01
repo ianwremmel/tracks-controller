@@ -44,7 +44,6 @@ function loadControllers({
 
   const controllers = new Map();
   for (const filename of filenames) {
-    // eslint-disable-next-line @typescript-eslint/no-var-requires
     const controllerModule = require(path.join(root, filename));
     const Controller = controllerModule.default || controllerModule;
     assert.equal(Controller.name, controllerize(filename));

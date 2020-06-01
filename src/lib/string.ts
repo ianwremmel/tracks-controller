@@ -1,10 +1,6 @@
 /** Converts a route string to a controller name */
 export function controllerize(filename: string): string {
-  return `${filename
-    .split('.')[0]
-    .split('/')
-    .map(ucFirst)
-    .join('')}Controller`;
+  return `${filename.split('.')[0].split('/').map(ucFirst).join('')}Controller`;
 }
 
 /** Converts a contorller name to a route string */

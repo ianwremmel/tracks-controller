@@ -65,10 +65,7 @@ describe('Controllers', () => {
     return () => {
       const app = express();
       app.use(mountControllers(controllers));
-      return supertest(app)
-        [method](path)
-        .expect(200)
-        .expect(expected);
+      return supertest(app)[method](path).expect(200).expect(expected);
     };
   }
 
@@ -426,10 +423,7 @@ describe('Controllers', () => {
           // @ts-ignore
           mountControllers(new Map([['filtered', FilteredController]]))
         );
-        return supertest(app)
-          .post('/filtered')
-          .expect(200)
-          .expect('ab');
+        return supertest(app).post('/filtered').expect(200).expect('ab');
       });
 
       it('adds several middleware before an action', () => {
@@ -462,10 +456,7 @@ describe('Controllers', () => {
           // @ts-ignore
           mountControllers(new Map([['filtered', FilteredController]]))
         );
-        return supertest(app)
-          .post('/filtered')
-          .expect(200)
-          .expect('abc');
+        return supertest(app).post('/filtered').expect(200).expect('abc');
       });
     });
   });
