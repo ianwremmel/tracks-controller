@@ -5,33 +5,21 @@ extends:
   - plugin:@ianwremmel/ianwremmel/modern
   - prettier
 overrides:
-  - env:
-      node: true
-    files:
-      - '*.config.js'
-    parserOptions:
-      sourceType: script
-    rules:
-      strict:
-        - error
-        - global
-  - env:
-      jest: true
-    files:
-      - '**/*.spec.*'
-    rules:
-      require-jsdoc: off
   - files:
       - '**/*.ts'
+      - '**/*.tsx'
+    extends:
+      - plugin:@typescript-eslint/recommended
+      - prettier/@typescript-eslint
+      - plugin:import/typescript
     parser: '@typescript-eslint/parser'
     parserOptions:
       project: ./tsconfig.json
+      sourceType: module
+    plugins:
+      - '@typescript-eslint'
     rules:
-      import/export: off
-      import/no-unresolved: off
-      no-redeclare: off
-      no-unused-vars: off
-      valid-jsdoc: off
+      '@typescript-eslint/ban-ts-comment': off
 parserOptions:
   sourceType: module
 rules:

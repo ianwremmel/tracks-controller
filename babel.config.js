@@ -1,9 +1,7 @@
-'use strict';
-
 module.exports = function (api) {
   api.cache(true);
 
-  return {
+  const config = {
     comments: false,
     presets: [
       '@babel/preset-typescript',
@@ -16,6 +14,9 @@ module.exports = function (api) {
         },
       ],
     ],
+    retainLines: process.env.NODE_ENV !== 'production',
     sourceMaps: true,
   };
+
+  return config;
 };

@@ -38,6 +38,7 @@ routes. See [usage](#usage) for how `Controller` can help.
 
 -   [Install](#install)
 -   [Usage](#usage)
+-   [ViewControllers](#viewcontrollers)
 -   [Maintainer](#maintainer)
 -   [Contribute](#contribute)
 -   [License](#license)
