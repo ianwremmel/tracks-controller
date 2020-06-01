@@ -22,7 +22,7 @@
     "lint:es": "npm run --silent eslint -- ."
   },
   "engines": {
-    "node": ">=10"
+    "node": ">=12"
   },
   "keywords": [],
   "author": "Ian Remmel <1182361+ianwremmel@users.noreply.github.com>",
