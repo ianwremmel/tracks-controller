@@ -28,7 +28,7 @@
   "author": "Ian Remmel <1182361+ianwremmel@users.noreply.github.com>",
   "license": "MIT",
   "dependencies": {
-    "@ianwremmel/typed-http-exceptions": "^1.2.0",
+    "@ianwremmel/typed-http-exceptions": "^1.2.1",
     "express": "^4.16.4",
     "glob": "^7.1.3",
     "lodash": "^4.17.11"
@@ -47,7 +47,7 @@
     "@types/glob": "^7.1.1",
     "@types/jest": "^25.1.0",
     "@types/lodash": "^4.14.154",
-    "@types/node": "^14.0.6",
+    "@types/node": "^14.0.9",
     "@types/supertest": "^2.0.7",
     "@typescript-eslint/eslint-plugin": "^3.0.2",
     "@typescript-eslint/parser": "^3.0.2",
