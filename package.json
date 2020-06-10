@@ -45,7 +45,7 @@
     "@ianwremmel/eslint-plugin-ianwremmel": "^4.0.2",
     "@types/express": "^4.16.1",
     "@types/glob": "^7.1.1",
-    "@types/jest": "^25.1.0",
+    "@types/jest": "^26.0.0",
     "@types/lodash": "^4.14.154",
     "@types/node": "^14.0.9",
     "@types/supertest": "^2.0.7",
